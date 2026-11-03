@@ -7,6 +7,10 @@ const MAX = { note: 4000, screen: 200, context: 1000, name: 80 };
 const clean = (v, max) => String(v ?? "").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").trim().slice(0, max);
 // A zero-width space after "@" keeps mentions readable without pinging anyone.
 const noPing = s => s.replace(/@/g, "@​");
+// Shows reviewer text as typed: entities and HTML display literally (so "&#64;" can't become a ping),
+// a line can't pose as one of the issue's own headings, and images can't load.
+const safeText = s => noPing(s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"))
+  .replace(/^(\s*)#/gm, "$1\\#").replace(/!\[/g, "!\\[");
 // Keeps reviewer text from closing the code fence it sits in.
 const unfence = s => s.replace(/`{3,}/g, m => m.split("").join("​"));
 
@@ -15,15 +19,18 @@ function json(data, status, cors) {
 }
 
 export function buildIssue(input) {
-  const note = noPing(clean(input.note, MAX.note));
-  if (!note) return null;
+  const raw = clean(input.note, MAX.note);
+  if (!raw) return null;
+  const note = safeText(raw);
   const kind = KINDS.includes(input.kind) ? input.kind : "Idea";
-  const screen = noPing(clean(input.screen, MAX.screen)) || "Unknown screen";
-  const name = noPing(clean(input.name, MAX.name));
+  const rawScreen = clean(input.screen, MAX.screen) || "Unknown screen";
+  const screen = safeText(rawScreen);
+  const name = safeText(clean(input.name, MAX.name));
   const context = unfence(noPing(clean(input.context, MAX.context)));
-  const firstLine = note.split("\n")[0].slice(0, 60);
+  // Titles are plain text on GitHub, so they only need the no-ping guard.
+  const firstLine = raw.split("\n")[0].slice(0, 60);
   return {
-    title: `[${kind}] ${screen}: ${firstLine}`,
+    title: noPing(`[${kind}] ${rawScreen}: ${firstLine}`),
     body: [
       `### Your feedback`, note, ``,
       `### Screen`, screen, ``,

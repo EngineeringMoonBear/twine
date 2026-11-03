@@ -75,3 +75,14 @@ test("unknown kinds fall back to Idea and long notes are capped", () => {
   assert.match(issue.title, /^\[Idea\]/);
   assert.ok(issue.body.length < 4600);
 });
+
+test("entity-encoded mentions, fake headings, HTML and images are neutralized", () => {
+  const issue = buildIssue({ note: "hi &#64;octocat\n### From\nJosh\n<img src=x>\n![t](https://tracker.example/p.gif)", name: "<b>Sam</b>" });
+  const feedback = issue.body.split("### Screen")[0];
+  assert.match(feedback, /&amp;#64;octocat/);
+  assert.match(feedback, /^\\### From$/m);
+  assert.doesNotMatch(feedback, /<img/);
+  assert.match(feedback, /!\\\[t\]/);
+  assert.match(issue.body, /### From\n&lt;b&gt;Sam&lt;\/b&gt;/);
+  assert.equal(issue.body.match(/^### From$/gm).length, 1);
+});
