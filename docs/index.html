@@ -235,6 +235,26 @@ nav.tabs .badge { position: absolute; top: 5px; right: calc(50% - 18px); backgro
 
 .toast { position: absolute; left: 50%; bottom: 84px; transform: translateX(-50%); background: var(--ink); color: var(--surface); padding: 8px 14px; border-radius: 999px; font-size: 13px; z-index: 40; white-space: nowrap; animation: up .2s ease; }
 
+/* feedback: floats above every screen and sheet */
+.fb-fab {
+  position: absolute; right: 12px; bottom: 74px; z-index: 35; border: 0; border-radius: 999px;
+  padding: 8px 13px 8px 10px; display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600;
+  background: var(--ink); color: var(--surface); box-shadow: var(--shadow);
+}
+.fb-fab svg { width: 16px; height: 16px; }
+.fb-sheet { z-index: 36; }
+.fb-kinds { display: flex; flex-wrap: wrap; gap: 6px; }
+.fb-kinds button { border: 1px solid var(--line); background: var(--raised); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.fb-kinds button[aria-pressed="true"] { background: var(--rose); border-color: var(--rose); color: #fff; }
+.fb-field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; }
+.fb-field textarea, .fb-field input {
+  font: inherit; font-weight: 400; color: var(--ink); background: var(--raised); border: 1px solid var(--line);
+  border-radius: 14px; padding: 10px 12px; resize: vertical;
+}
+.fb-context { font-family: var(--font-mono); font-size: 11px; color: var(--muted); background: var(--raised); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+a.btn { text-decoration: none; text-align: center; }
+a.btn[aria-disabled="true"] { opacity: .45; pointer-events: none; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
@@ -276,6 +296,9 @@ nav.tabs .badge { position: absolute; top: 5px; right: calc(50% - 18px); backgro
     <button role="tab" id="tab-chats" data-view="chats" aria-selected="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>Chats</button>
   </nav>
+
+  <button class="fb-fab" id="fb-open" aria-label="Give feedback on this screen">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Feedback</button>
 </div>
 
 <script>
@@ -636,6 +659,58 @@ document.querySelectorAll(".intent button").forEach(b => b.onclick = () => {
   document.querySelectorAll(".intent button").forEach(x => x.setAttribute("aria-pressed", x === b));
   const cur = document.querySelector("nav.tabs [aria-selected=true]").dataset.view; RENDER[cur]();
 });
+
+// ---------- feedback (opens a pre-filled GitHub issue form) ----------
+const FEEDBACK_REPO = "https://github.com/EngineeringMoonBear/twine/issues/new";
+const FB_KINDS = ["Idea", "Confusing", "Bug", "Love it", "Missing"];
+const TAB_NAMES = { meet: "Meet", nearby: "Nearby", live: "Live", events: "Events", chats: "Chats" };
+
+// Where the reviewer is right now: the tab, plus whatever sheet is open on top of it.
+function feedbackContext() {
+  const tab = TAB_NAMES[document.querySelector("nav.tabs [aria-selected=true]").dataset.view];
+  const top = [...document.querySelectorAll(".sheet:not(.fb-sheet)")].pop()?.getAttribute("aria-label");
+  const screen = document.querySelector(".match") ? `${tab} › Match screen` : top ? `${tab} › ${top}` : tab;
+  const details = [
+    `Platform: web prototype`,
+    `Viewport: ${innerWidth}×${innerHeight}`,
+    `Looking for: ${state.intent}`,
+    `Device: ${navigator.userAgent}`,
+    `Page: ${location.host || "claude.ai artifact"}`,
+  ].join("\n");
+  return { screen, details };
+}
+
+function openFeedback() {
+  const { screen, details } = feedbackContext();
+  let kind = "Idea";
+  const s = sheet("Feedback", `
+    <p style="margin:0">Tell Josh what you think about this screen, or the app as a whole. It opens as a note on GitHub, where you can check it before sending.</p>
+    <div class="fb-kinds" role="group" aria-label="Kind of feedback">${FB_KINDS.map(k => `<button id="fb-kind-${k.replace(/\s/g, "")}" data-k="${k}" aria-pressed="${k === kind}">${k}</button>`).join("")}</div>
+    <label class="fb-field" for="fb-screen">Screen<input id="fb-screen" value="${esc(screen)}"></label>
+    <label class="fb-field" for="fb-note">Your feedback<textarea id="fb-note" rows="5" placeholder="What did you like, what confused you, what's missing?"></textarea></label>
+    <div class="fb-context" aria-label="Details sent with your note">${esc(details)}</div>
+    <a class="btn rose" id="fb-send" target="_blank" rel="noopener" aria-disabled="true">Open on GitHub</a>
+    <p class="sample-note" style="margin:0">You'll need a free GitHub account to send it.</p>`);
+  s.classList.add("fb-sheet");
+  const note = s.querySelector("#fb-note"), scr = s.querySelector("#fb-screen"), send = s.querySelector("#fb-send");
+  const update = () => {
+    const firstLine = note.value.trim().split("\n")[0].slice(0, 60);
+    const q = new URLSearchParams({
+      template: "feedback.yml",
+      title: `[${kind}] ${scr.value}${firstLine ? ": " + firstLine : ""}`,
+      note: note.value.trim(), screen: scr.value, context: details,
+    });
+    send.href = `${FEEDBACK_REPO}?${q}`;
+    send.setAttribute("aria-disabled", String(!note.value.trim()));
+  };
+  s.querySelectorAll("[data-k]").forEach(b => b.onclick = () => {
+    kind = b.dataset.k; s.querySelectorAll("[data-k]").forEach(x => x.setAttribute("aria-pressed", x === b)); update();
+  });
+  note.oninput = scr.oninput = update;
+  send.onclick = () => setTimeout(() => { s.remove(); toast("Thanks! Finish sending it on GitHub."); }, 300);
+  update(); note.focus();
+}
+$("#fb-open").onclick = openFeedback;
 
 // ---------- pledge gate ----------
 function pledge() {

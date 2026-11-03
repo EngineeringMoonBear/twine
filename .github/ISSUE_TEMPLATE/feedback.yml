@@ -1,0 +1,25 @@
+name: App feedback
+description: A suggestion, bug, or reaction from trying the Twine prototype.
+title: "[Feedback] "
+labels: ["feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for trying Twine! Anything goes, big or small. The screen and device details below were filled in by the app.
+  - type: textarea
+    id: note
+    attributes:
+      label: Your feedback
+      description: What you liked, what confused you, what's missing, or what felt off.
+    validations:
+      required: true
+  - type: input
+    id: screen
+    attributes:
+      label: Screen
+      description: Where you were in the app.
+  - type: textarea
+    id: context
+    attributes:
+      label: App and device details
+      description: Filled in automatically. Fine to leave as is.
