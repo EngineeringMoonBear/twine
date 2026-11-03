@@ -228,6 +228,142 @@ nav.tabs .badge { position: absolute; top: 5px; right: calc(50% - 18px); backgro
 
 .toast { position: absolute; left: 50%; bottom: 84px; transform: translateX(-50%); background: var(--ink); color: var(--surface); padding: 8px 14px; border-radius: 999px; font-size: 13px; z-index: 40; white-space: nowrap; animation: up .2s ease; }
 
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ---------- moderation console ---------- */
+/* Mod mode: dark header band, severity pills, category highlights on flagged text, editable fixes. */
+:root {
+  --mod-band: #2a1730; --mod-band-ink: #fff4f8;
+  --sev-high: #c4262e; --sev-high-soft: #fde4e4;
+  --sev-med: #a35f00; --sev-med-soft: #fdf0d9;
+  --sev-low: #3f6489; --sev-low-soft: #e3ecf5;
+  --hl-dating: #ffd3e3; --hl-invasive: #ffe0b0; --hl-fetish: #efcbff; --hl-misgender: #cfe5ff; --hl-ink: #2a1730;
+  --fetish: #8a3cc2;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --mod-band: #0b070d; --mod-band-ink: #f6e9f0;
+    --sev-high: #ff7a7a; --sev-high-soft: #3d1717; --sev-med: #f0b54a; --sev-med-soft: #3a2a10; --sev-low: #8fb4dc; --sev-low-soft: #1a2633;
+    --hl-dating: #6b2442; --hl-invasive: #5c3a12; --hl-fetish: #4e2465; --hl-misgender: #1d3d5e; --hl-ink: #fff4f8; --fetish: #d79bff;
+  }
+}
+:root[data-theme="dark"] {
+  --mod-band: #0b070d; --mod-band-ink: #f6e9f0;
+  --sev-high: #ff7a7a; --sev-high-soft: #3d1717; --sev-med: #f0b54a; --sev-med-soft: #3a2a10; --sev-low: #8fb4dc; --sev-low-soft: #1a2633;
+  --hl-dating: #6b2442; --hl-invasive: #5c3a12; --hl-fetish: #4e2465; --hl-misgender: #1d3d5e; --hl-ink: #fff4f8; --fetish: #d79bff;
+}
+
+.app.mod .top { background: var(--mod-band); color: var(--mod-band-ink); padding-bottom: 14px; }
+.app.mod .intent { background: transparent; border-color: color-mix(in srgb, var(--mod-band-ink) 30%, transparent); }
+.app.mod .intent button { color: color-mix(in srgb, var(--mod-band-ink) 70%, transparent); }
+.app.mod .intent button[aria-pressed="true"] { background: var(--mod-band-ink); color: var(--mod-band); }
+.app.mod nav.tabs button[aria-selected="true"] { color: var(--teal); }
+.app.mod main .view { padding-top: 14px; }
+.modpill { font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; background: var(--teal); color: #fff; padding: 2px 6px; border-radius: 5px; }
+
+mark.hl { color: var(--hl-ink); border-radius: 4px; padding: 0 2px; border-bottom: 2px solid; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.hl-dating { background: var(--hl-dating); border-color: var(--rose); }
+.hl-invasive { background: var(--hl-invasive); border-color: var(--gold); }
+.hl-fetish { background: var(--hl-fetish); border-color: var(--fetish); }
+.hl-misgender { background: var(--hl-misgender); border-color: var(--sev-low); }
+.chip.c-dating { background: var(--hl-dating); color: var(--hl-ink); }
+.chip.c-invasive { background: var(--hl-invasive); color: var(--hl-ink); }
+.chip.c-fetish { background: var(--hl-fetish); color: var(--hl-ink); }
+.chip.c-misgender { background: var(--hl-misgender); color: var(--hl-ink); }
+.chip.c-other { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+
+.sev { font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; padding: 3px 7px; border-radius: 6px; font-weight: 500; }
+.sev.high { background: var(--sev-high-soft); color: var(--sev-high); }
+.sev.med { background: var(--sev-med-soft); color: var(--sev-med); }
+.sev.low { background: var(--sev-low-soft); color: var(--sev-low); }
+.sev.done { background: var(--teal-soft); color: var(--teal); }
+
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line); background: var(--raised); border-radius: 16px; }
+.stats div { padding: 10px 12px; min-width: 0; }
+.stats div + div { border-left: 1px solid var(--line); }
+.stats b { display: block; font-family: var(--font-display); font-size: 26px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stats b.alert { color: var(--sev-high); }
+.stats small { font-size: 11px; color: var(--muted); }
+
+.case-list { display: flex; flex-direction: column; gap: 10px; }
+.case { display: flex; flex-direction: column; gap: 8px; text-align: left; width: 100%; border: 1px solid var(--line); background: var(--raised); border-radius: 16px; padding: 12px 14px; }
+.case:hover { border-color: var(--muted); }
+.case.closed { opacity: .65; }
+.case-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.case-text { display: block; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
+.case-foot { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.case-foot .claimed { color: var(--teal); font-weight: 600; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 12px; color: var(--muted); align-items: center; }
+.legend mark { font-size: 12px; }
+.quote { display: block; border: 1px solid var(--line); background: var(--raised); border-radius: 14px; padding: 12px 14px; font-size: 15px; line-height: 1.65; overflow-wrap: anywhere; }
+.quote.small { font-size: 13px; padding: 8px 10px; background: var(--surface); }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0; font-size: 13px; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; min-width: 0; }
+.rec { border: 1px solid var(--teal); background: var(--teal-soft); color: var(--ink); border-radius: 12px; padding: 10px 12px; font-size: 13px; }
+.rec b { color: var(--teal); }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+textarea, .field input { width: 100%; border: 1px solid var(--line); background: var(--raised); color: var(--ink); border-radius: 12px; padding: 10px 12px; font: inherit; font-size: 14px; resize: vertical; }
+textarea { min-height: 76px; }
+textarea:focus-visible, .field input:focus-visible { outline: 2px solid var(--teal); outline-offset: 1px; }
+.fixcheck { font-size: 12px; display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap; }
+.fixcheck.ok { color: var(--teal); font-weight: 600; }
+.fixcheck.bad { color: var(--sev-high); }
+.action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.action-grid .btn { padding: 10px 12px; }
+.btn.teal { background: var(--teal); color: #fff; }
+.btn.danger { background: var(--sev-high); color: #fff; }
+.btn.danger.armed { outline: 3px solid var(--sev-high-soft); }
+.divider { border: 0; border-top: 1px solid var(--line); margin: 4px 0; width: 100%; }
+
+.panel { border: 1px solid var(--line); background: var(--raised); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.panel h3 { font-size: 16px; }
+.room-row { display: flex; flex-direction: column; gap: 6px; padding-block: 10px; border-top: 1px solid var(--line); }
+.room-row:first-of-type { border-top: 0; padding-top: 0; }
+.room-row .line { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.room-row .line > div { min-width: 0; }
+.room-row b { display: block; font-size: 14px; }
+.room-row small { font-size: 12px; color: var(--muted); }
+.meter { height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.meter i { display: block; height: 100%; border-radius: 999px; background: var(--teal); }
+.meter i.warm { background: var(--sev-med); }
+.meter i.hot { background: var(--sev-high); }
+.held { display: flex; flex-direction: column; gap: 6px; padding-block: 10px; border-top: 1px solid var(--line); font-size: 14px; }
+.held:first-of-type { border-top: 0; padding-top: 0; }
+.held .who { font-size: 12px; color: var(--muted); }
+.held .hint { font-size: 12px; color: var(--teal); }
+.mini-acts, .msg-acts { display: flex; gap: 6px; flex-wrap: wrap; }
+.mini-acts button, .msg-acts button { border: 1px solid var(--line); background: var(--raised); border-radius: 999px; padding: 3px 11px; font-size: 12px; font-weight: 600; }
+.mini-acts button.x, .msg-acts button.x { color: var(--sev-high); }
+
+.msg.flagged { background: var(--sev-high-soft); border-radius: 10px; padding: 6px 8px; display: flex; flex-direction: column; gap: 6px; }
+.log-row { display: grid; grid-template-columns: 54px 1fr; gap: 10px; padding-block: 10px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.log-row time { font-family: var(--font-mono); font-size: 11px; color: var(--muted); padding-top: 2px; font-variant-numeric: tabular-nums; }
+.log-row small { display: block; font-size: 12px; color: var(--muted); }
+.roster { display: flex; flex-direction: column; gap: 10px; }
+.mod-row { display: flex; align-items: center; gap: 10px; }
+.mod-row .av { width: 38px; height: 38px; border-radius: 12px; flex: none; }
+.mod-row .av span { font-size: 16px; }
+.mod-row .txt { flex: 1; min-width: 0; font-size: 14px; }
+.mod-row small { display: block; color: var(--muted); font-size: 12px; }
+.onshift { font-size: 11px; font-weight: 600; color: var(--teal); white-space: nowrap; }
+.onshift.off { color: var(--muted); }
+.ladder { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+.ladder li::marker { font-family: var(--font-display); font-weight: 800; color: var(--teal); }
+.twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px; }
+.twocol ul { margin: 4px 0 0; padding-left: 16px; display: flex; flex-direction: column; gap: 4px; }
+.twocol h4 { margin: 0; font-size: 12px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: .06em; }
+.twocol .no h4 { color: var(--sev-high); }
+.twocol .yes h4 { color: var(--teal); }
+
+.nudge { margin: 0 12px; border: 1px solid var(--rose); background: var(--rose-soft); border-radius: 14px; padding: 10px 12px; font-size: 13px; display: flex; flex-direction: column; gap: 6px; }
+.nudge b { color: var(--rose); }
+.friends-only { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted); justify-content: center; }
+.friends-only svg { width: 14px; height: 14px; color: var(--teal); flex: none; }
 /* feedback: floats above every screen and sheet */
 .fb-fab {
   position: absolute; right: 12px; bottom: 74px; z-index: 35; border: 0; border-radius: 999px;
@@ -239,18 +375,10 @@ nav.tabs .badge { position: absolute; top: 5px; right: calc(50% - 18px); backgro
 .fb-kinds { display: flex; flex-wrap: wrap; gap: 6px; }
 .fb-kinds button { border: 1px solid var(--line); background: var(--raised); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 600; color: var(--muted); }
 .fb-kinds button[aria-pressed="true"] { background: var(--rose); border-color: var(--rose); color: #fff; }
-.fb-field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; }
-.fb-field textarea, .fb-field input {
-  font: inherit; font-weight: 400; color: var(--ink); background: var(--raised); border: 1px solid var(--line);
-  border-radius: 14px; padding: 10px 12px; resize: vertical;
-}
 .fb-context { font-family: var(--font-mono); font-size: 11px; color: var(--muted); background: var(--raised); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.fb-send { display: flex; flex-direction: column; gap: 8px; }
 a.btn { text-decoration: none; text-align: center; }
-a.btn[aria-disabled="true"] { opacity: .45; pointer-events: none; }
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; transition: none !important; }
-}
+a.btn[aria-disabled="true"], .btn:disabled { opacity: .45; pointer-events: none; }
 </style>
 
 <div class="app" id="app">
@@ -260,12 +388,11 @@ a.btn[aria-disabled="true"] { opacity: .45; pointer-events: none; }
         <path d="M4 26 C 10 18, 20 18, 15 15 S 10 8, 26 4" fill="none" stroke="var(--rose)" stroke-width="3.2" stroke-linecap="round"/>
         <path d="M4 4 C 10 12, 20 12, 15 15 S 10 22, 26 26" fill="none" stroke="var(--teal)" stroke-width="3.2" stroke-linecap="round"/>
       </svg>
-      <h1>Twine</h1>
+      <h1>Twine</h1><span class="modpill" id="modpill" hidden>Mod</span>
     </div>
-    <div class="intent" role="group" aria-label="What you're here for">
-      <button id="intent-friends" aria-pressed="true" data-intent="friends">Friends</button>
-      <button id="intent-dating" aria-pressed="false" data-intent="dating">Dating</button>
-      <button id="intent-both" aria-pressed="false" data-intent="both">Both</button>
+    <div class="intent" role="group" aria-label="Switch between member app and mod tools">
+      <button id="mode-member" aria-pressed="true" data-mode="member">Member</button>
+      <button id="mode-mod" aria-pressed="false" data-mode="mod">Mod team</button>
     </div>
   </header>
 
@@ -275,20 +402,13 @@ a.btn[aria-disabled="true"] { opacity: .45; pointer-events: none; }
     <section class="view" id="view-live" aria-label="Live" hidden></section>
     <section class="view" id="view-events" aria-label="Events" hidden></section>
     <section class="view" id="view-chats" aria-label="Chats" hidden></section>
+    <section class="view" id="view-queue" aria-label="Review queue" hidden></section>
+    <section class="view" id="view-modlive" aria-label="Live rooms" hidden></section>
+    <section class="view" id="view-log" aria-label="Action log" hidden></section>
+    <section class="view" id="view-team" aria-label="Team and policy" hidden></section>
   </main>
 
-  <nav class="tabs" role="tablist">
-    <button role="tab" id="tab-meet" data-view="meet" aria-selected="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="5" y="3" width="12" height="16" rx="3" transform="rotate(-8 11 11)"/><path d="M9 21h9a3 3 0 0 0 3-3V8"/></svg>Meet</button>
-    <button role="tab" id="tab-nearby" data-view="nearby" aria-selected="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Nearby</button>
-    <button role="tab" id="tab-live" data-view="live" aria-selected="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="2" y="5" width="15" height="14" rx="3"/><path d="M17 10l5-3v10l-5-3z"/></svg>Live<span class="badge">4</span></button>
-    <button role="tab" id="tab-events" data-view="events" aria-selected="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Events</button>
-    <button role="tab" id="tab-chats" data-view="chats" aria-selected="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>Chats</button>
-  </nav>
+  <nav class="tabs" role="tablist" id="tabs"></nav>
 
   <button class="fb-fab" id="fb-open" aria-label="Give feedback on this screen">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Feedback</button>
@@ -300,31 +420,32 @@ const PALETTES = [
   ["#c9386e", "#f59bb8"], ["#12807a", "#7fd8cc"], ["#6b3fa0", "#e08ad6"], ["#d9622b", "#f7c66b"],
   ["#2f5fb3", "#8fd3f4"], ["#a8396b", "#ffb38a"], ["#1e8c5a", "#c6e86b"], ["#8a3cc2", "#5ec4d6"],
 ];
+const OFFERS = { friends: "Friendship", crew: "Show-up crew", skills: "Skill share", walk: "Walk-home buddy" };
 const people = [
-  { id: 1, name: "Maren", age: 29, pronouns: "she/her", trans: true, intents: ["friends", "dating"], miles: 1.4, online: true, verified: true,
+  { id: 1, name: "Maren", age: 29, pronouns: "she/her", offers: ["friends", "skills"], miles: 1.4, online: true, verified: true,
     tags: ["Climbing", "Synthwave", "Board games"], prompt: ["A green flag I look for", "You ask before you assume."], p: 0 },
-  { id: 2, name: "Dana", age: 33, pronouns: "she/they", trans: false, intents: ["friends"], miles: 2.1, online: true, verified: true,
+  { id: 2, name: "Dana", age: 33, pronouns: "she/they", offers: ["friends", "crew"], miles: 2.1, online: true, verified: true,
     tags: ["Ally since forever", "Bookbinding", "Trail runs"], prompt: ["I'm here to", "Show up. Rides to appointments, protest buddy, movie nights."], p: 1 },
-  { id: 3, name: "Priya", age: 26, pronouns: "she/her", trans: true, intents: ["dating"], miles: 3.8, online: false, verified: true,
+  { id: 3, name: "Priya", age: 26, pronouns: "she/her", offers: ["friends", "skills"], miles: 3.8, online: false, verified: true,
     tags: ["Voice coach", "Bollywood dance", "Cats"], prompt: ["Ideal first hang", "Bubble tea, then a bookstore we get lost in."], p: 2 },
-  { id: 4, name: "Kelsey", age: 31, pronouns: "she/her", trans: false, intents: ["friends", "dating"], miles: 0.9, online: true, verified: false,
+  { id: 4, name: "Kelsey", age: 31, pronouns: "she/her", offers: ["crew", "friends"], miles: 0.9, online: true, verified: false,
     tags: ["Nurse", "Pottery", "Karaoke"], prompt: ["Ask me about", "Why I volunteer at the gender clinic on Saturdays."], p: 3 },
-  { id: 5, name: "Juno", age: 24, pronouns: "she/her", trans: true, intents: ["friends"], miles: 5.2, online: true, verified: true,
+  { id: 5, name: "Juno", age: 24, pronouns: "she/her", offers: ["friends"], miles: 5.2, online: true, verified: true,
     tags: ["Streamer", "Cozy games", "Thrifting"], prompt: ["Find me", "Hosting Cozy Co-op on Live, Thursday nights."], p: 4 },
-  { id: 6, name: "Rosa", age: 38, pronouns: "she/her", trans: false, intents: ["friends"], miles: 4.0, online: false, verified: true,
+  { id: 6, name: "Rosa", age: 38, pronouns: "she/her", offers: ["crew", "friends"], miles: 4.0, online: false, verified: true,
     tags: ["Mom of two", "Gardening", "PFLAG"], prompt: ["What I bring", "Tomatoes. So many tomatoes."], p: 6 },
-  { id: 7, name: "Ash", age: 27, pronouns: "she/her", trans: true, intents: ["dating"], miles: 2.7, online: true, verified: true,
+  { id: 7, name: "Ash", age: 27, pronouns: "she/her", offers: ["friends", "walk"], miles: 2.7, online: true, verified: true,
     tags: ["Bass player", "Ramen", "Tarot"], prompt: ["Dealbreaker", "If you need me to explain my existence, it's a pass."], p: 7 },
-  { id: 8, name: "Tess", age: 30, pronouns: "she/her", trans: false, intents: ["friends", "dating"], miles: 6.3, online: false, verified: true,
+  { id: 8, name: "Tess", age: 30, pronouns: "she/her", offers: ["friends", "skills"], miles: 6.3, online: false, verified: true,
     tags: ["Roller derby", "Zines", "Dogs"], prompt: ["Typical Sunday", "Derby practice, then brunch with whoever survived."], p: 5 },
-  { id: 9, name: "Lena", age: 35, pronouns: "she/her", trans: true, intents: ["friends"], miles: 1.9, online: true, verified: true,
+  { id: 9, name: "Lena", age: 35, pronouns: "she/her", offers: ["walk", "friends"], miles: 1.9, online: true, verified: true,
     tags: ["Software dev", "Hiking", "Baking"], prompt: ["Looking for", "Women to go to shows with so nobody walks home alone."], p: 1 },
 ];
 const rooms = [
-  { id: "r1", title: "Cozy Co-op: Stardew night", host: "Juno", cat: "Gaming", viewers: 212, mods: 3, p: 4 },
-  { id: "r2", title: "Voice practice circle (camera optional)", host: "Priya", cat: "Skill share", viewers: 48, mods: 2, p: 2 },
-  { id: "r3", title: "Makeup & a mug of tea", host: "Ash", cat: "Lounge", viewers: 131, mods: 2, p: 7 },
-  { id: "r4", title: "Allies 101: how to actually show up", host: "Dana", cat: "Talk", viewers: 87, mods: 4, p: 1 },
+  { id: "r1", title: "Cozy Co-op: Stardew night", host: "Juno", cat: "Gaming", viewers: 212, mods: 3, p: 4, flags: 3 },
+  { id: "r2", title: "Voice practice circle (camera optional)", host: "Priya", cat: "Skill share", viewers: 48, mods: 2, p: 2, flags: 1 },
+  { id: "r3", title: "Makeup & a mug of tea", host: "Ash", cat: "Lounge", viewers: 131, mods: 1, p: 7, flags: 6 },
+  { id: "r4", title: "Allies 101: how to actually show up", host: "Dana", cat: "Talk", viewers: 87, mods: 4, p: 1, flags: 2 },
 ];
 const events = [
   { id: "e1", mon: "NOV", day: 7, title: "Thread & Thrift Mixer", kind: "Mixer", where: "The Loom Café, upstairs room", time: "Fri 7–10 pm", going: 46, cap: 60, vetted: true, t: false },
@@ -339,11 +460,104 @@ const threads = [
   { with: 5, last: "come by stream tonight 🌱", when: "Tue" },
 ];
 
+// ---------- rules and the content filter ----------
+const RULES = [
+  "Trans women are women. No debate, no \"just asking questions.\"",
+  "Nobody owes you their history, their body, or their transition story.",
+  "Being trans is a person, not a type. Profiles that fetishize get removed.",
+  "Allyship is something you do: show up, listen, and back each other up.",
+  "Twine is a friendship space. Treat everyone the way you'd treat a friend.",
+];
+const FLAG_CATS = {
+  dating:    { label: "Unwanted advances", rule: 5 },
+  invasive:  { label: "Invasive question", rule: 2 },
+  fetish:    { label: "Fetishizing", rule: 3 },
+  misgender: { label: "Misgendering", rule: 1 },
+  other:     { label: "Other report", rule: 4 },
+};
+// The filter only highlights. A mod always makes the call.
+const FLAG_RULES = [
+  ["dating", /\b(?:double date|date night|dates?|dating)\b/gi],
+  ["dating", /\b(?:cute|single|girlfriend|hook ?ups?|kiss(?:es)?|flirt\w*)\b/gi],
+  ["dating", /\b(?:more than friends|just the two of us|my person)\b/gi],
+  ["dating", /😉|😘/gu],
+  ["invasive", /\b(?:pre-op|post-op|surgery|born a \w+|deadname|real name)\b/gi],
+  ["fetish", /\b(?:a thing for trans \w+|chasers?|exotic)\b/gi],
+  ["misgender", /\b(?:sir|dude|he's a guy)\b/gi],
+];
+function findFlags(text) {
+  const hits = [];
+  for (const [cat, re] of FLAG_RULES) {
+    re.lastIndex = 0; let m;
+    while ((m = re.exec(text))) { hits.push({ cat, start: m.index, end: m.index + m[0].length }); if (!m[0].length) re.lastIndex++; }
+  }
+  hits.sort((a, b) => a.start - b.start || b.end - a.end);
+  const out = [];
+  for (const h of hits) { const last = out[out.length - 1]; if (!last || h.start >= last.end) out.push(h); }
+  return out;
+}
+function highlight(text) {
+  let html = "", i = 0;
+  for (const h of findFlags(text)) {
+    html += esc(text.slice(i, h.start)) + `<mark class="hl hl-${h.cat}" title="${FLAG_CATS[h.cat].label}">${esc(text.slice(h.start, h.end))}</mark>`;
+    i = h.end;
+  }
+  return html + esc(text.slice(i));
+}
+function stripFlags(text) {
+  let out = "", i = 0;
+  for (const h of findFlags(text)) { out += text.slice(i, h.start); i = h.end; }
+  return (out + text.slice(i)).replace(/\s+([,.!?])/g, "$1").replace(/\s{2,}/g, " ").replace(/^[\s,.]+/, "").trim();
+}
+
+// ---------- moderation data (fictional) ----------
+const cases = [
+  { id: "T-1042", sev: "high", cat: "fetish", source: "Report", where: "Profile bio", who: "Brooke M.", by: "Ash", age: 12, strikes: 0, claimed: null, status: "open",
+    text: "Always had a thing for trans girls, looking to make some new friends 😘" },
+  { id: "T-1041", sev: "high", cat: "invasive", source: "Auto-flag", where: "Live · Makeup & a mug of tea", who: "jj_88", by: "Twine filter", age: 19, strikes: 1, claimed: "Rosa", status: "open",
+    text: "are you pre-op? just curious lol" },
+  { id: "T-1039", sev: "med", cat: "dating", source: "Report", where: "Direct message", who: "Kayla R.", by: "Lena", age: 31, strikes: 0, claimed: null, status: "open",
+    text: "You're really cute. Want to grab drinks, just the two of us? Like a date 😉" },
+  { id: "T-1038", sev: "med", cat: "dating", source: "Auto-flag", where: "Profile bio", who: "Sam T.", by: "Twine filter", age: 38, strikes: 1, claimed: null, status: "open",
+    text: "Single and looking for my person. Open to more than friends if it clicks.",
+    fix: "Looking for my people. Always up for a board game night." },
+  { id: "T-1036", sev: "low", cat: "dating", source: "Auto-flag", where: "Event chat · Roller Rink Night", who: "Mo P.", by: "Twine filter", age: 52, strikes: 0, claimed: null, status: "open",
+    text: "Anyone want to make the roller rink a double date? 😉",
+    fix: "Anyone want to carpool to the roller rink? Room for three." },
+  { id: "T-1035", sev: "med", cat: "misgender", source: "Report", where: "Live · Allies 101", who: "pat_w", by: "Dana", age: 64, strikes: 0, claimed: null, status: "open",
+    text: "ok sir, calm down, it was a joke" },
+];
+const held = [
+  { id: "h1", room: "r1", who: "tommy_k", text: "juno you're so cute, are you single? 😉" },
+  { id: "h2", room: "r3", who: "ray", text: "ok sir, love the eyeliner tho" },
+  { id: "h3", room: "r2", who: "bea", text: "my surgery date finally came through!! so nervous", hint: "She's sharing her own news. Likely fine to allow." },
+];
+const mods = [
+  { name: "Dana", role: "Lead mod", shift: "6 pm – 12 am", on: true, p: 1 },
+  { name: "Rosa", role: "Mod", shift: "4 pm – 10 pm", on: true, p: 6 },
+  { name: "You", role: "Mod", shift: "8 pm – 2 am", on: true, p: 5 },
+  { name: "Lena", role: "Mod", shift: "Weekends", on: false, p: 0 },
+];
+const log = [
+  { t: "9:41 pm", who: "Rosa", what: "Hid a message in Cozy Co-op", ref: "T-1040" },
+  { t: "9:22 pm", who: "Dana", what: "Applied a profile fix for Wren A. (pickup language removed) and sent a warning", ref: "T-1037" },
+  { t: "8:58 pm", who: "Dana", what: "Removed a member for fetishizing (rule 3)", ref: "T-1033" },
+  { t: "8:30 pm", who: "Rosa", what: "Dismissed a report: compliment on a jacket, no rule broken", ref: "T-1031" },
+];
+const SEV = { high: "High", med: "Medium", low: "Low" };
+const SEV_RANK = { high: 0, med: 1, low: 2 };
+const ACTIONS = { fix: "Apply fix", hide: "Hide content", warn: "Send warning", mute: "Mute 7 days", remove: "Remove from Twine", dismiss: "Dismiss" };
+const DONE_LABEL = { fix: "Fixed", hide: "Hidden", warn: "Warned", mute: "Muted", remove: "Removed", dismiss: "Dismissed" };
+
 // ---------- state ----------
-const state = { intent: "friends", deck: [], filters: new Set(["online"]), rsvp: new Set(), buddy: new Set(), pledged: false };
+const state = { mode: "member", view: "meet", filters: new Set(["online"]), rsvp: new Set(), buddy: new Set(), seen: new Set(), qf: "open" };
 const byId = id => people.find(p => p.id === id);
 const $ = sel => document.querySelector(sel);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const nowStr = () => new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }).toLowerCase();
+const fmtAge = m => m < 60 ? `${m}m` : `${Math.floor(m / 60)}h ${m % 60}m`;
+const addLog = (what, ref = "") => log.unshift({ t: nowStr(), who: "You", what, ref });
+const openCases = () => cases.filter(c => c.status === "open");
 
 function avatar(p, extra = "") {
   const [a, b] = PALETTES[p.p % PALETTES.length];
@@ -351,38 +565,36 @@ function avatar(p, extra = "") {
 }
 // Distance is always blurred so nobody can be triangulated.
 const fuzzy = mi => mi < 1 ? "under 1 mi" : mi < 5 ? `~${Math.round(mi)} mi` : "in your city";
-const intentMatches = p => state.intent === "both" || p.intents.includes(state.intent);
+const offerChips = p => p.offers.map(o => `<span class="chip t">${OFFERS[o]}</span>`).join("");
+const SHIELD = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>`;
 
 // Ranks people on the Nearby grid. This is the product's personality:
 // what should float to the top for someone opening the app?
 function rankNearby(list) {
   // TODO(Josh): replace this default with your ranking.
-  // Ideas: verified first? online first? mutual intent? a fair mix of allies and trans women?
+  // Ideas: verified first? online first? a fair mix of allies and trans women?
   return [...list].sort((a, b) => a.miles - b.miles);
 }
 
-// ---------- MEET (swipe deck) ----------
+// ---------- MEET (friend deck) ----------
 function renderMeet() {
   const v = $("#view-meet");
-  state.deck = people.filter(intentMatches).filter(p => !state.seen?.has(p.id));
-  if (!state.deck.length) {
+  const deck = people.filter(p => !state.seen.has(p.id));
+  if (!deck.length) {
     v.innerHTML = `<div class="empty"><h2>You're all caught up</h2><p>New people join every day. Meanwhile, there's a mixer this Friday.</p><button class="btn rose" id="go-events">See events</button></div>`;
     $("#go-events").onclick = () => show("events");
     return;
   }
-  const cards = state.deck.slice(0, 3).reverse().map((p, i, arr) => {
+  const cards = deck.slice(0, 3).reverse().map((p, i, arr) => {
     const depth = arr.length - 1 - i;
     return `<article class="card" data-id="${p.id}" style="transform: translateY(${depth * 10}px) scale(${1 - depth * .04}); z-index:${10 - depth}">
       ${avatar(p)}
-      <div class="stamp wave">WAVE</div><div class="stamp pass">PASS</div><div class="stamp spark">SPARK</div>
+      <div class="stamp wave">WAVE</div><div class="stamp pass">PASS</div>
       <div class="info">
         <div class="name"><h2>${esc(p.name)}, ${p.age}</h2><span class="pron">${esc(p.pronouns)}</span>
           ${p.verified ? `<span class="verified"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 2.2 3.2-.4.9 3.1 2.8 1.6-1.2 3 1.2 3-2.8 1.6-.9 3.1-3.2-.4L12 22l-2.4-2.2-3.2.4-.9-3.1L2.7 15.5l1.2-3-1.2-3 2.8-1.6.9-3.1 3.2.4z"/><path d="M8 12l3 3 5-6" stroke="#fff" stroke-width="2" fill="none"/></svg>Verified</span>` : ""}
         </div>
-        <div class="chips">
-          ${p.intents.map(i => `<span class="chip ${i === "friends" ? "t" : ""}">${i === "friends" ? "Friends" : "Dating"}</span>`).join("")}
-          ${p.tags.map(t => `<span class="chip g">${esc(t)}</span>`).join("")}
-        </div>
+        <div class="chips">${offerChips(p)}${p.tags.map(t => `<span class="chip g">${esc(t)}</span>`).join("")}</div>
         <div class="prompt"><b>${esc(p.prompt[0])}</b>${esc(p.prompt[1])}</div>
       </div>
     </article>`;
@@ -391,14 +603,12 @@ function renderMeet() {
     <div class="deck" id="deck">${cards}</div>
     <div class="actions">
       <button class="act pass" id="btn-pass" aria-label="Pass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-      <button class="act wave" id="btn-wave" aria-label="Wave, friendship"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11V6.5a1.5 1.5 0 0 1 3 0V11m0-5.5V4.5a1.5 1.5 0 0 1 3 0V11m0-5a1.5 1.5 0 0 1 3 0v6m0-3a1.5 1.5 0 0 1 3 0v4a7 7 0 0 1-7 7h-1a7 7 0 0 1-5.6-2.8L4 15.5a1.6 1.6 0 0 1 2.5-2L7 14"/></svg></button>
-      <button class="act spark" id="btn-spark" aria-label="Spark, dating"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.5-9.3C1.2 8.4 3.3 5 6.8 5c2 0 3.6 1.1 5.2 3 1.6-1.9 3.2-3 5.2-3 3.5 0 5.6 3.4 4.3 6.7C19.5 16.4 12 21 12 21z"/></svg></button>
+      <button class="act wave" id="btn-wave" aria-label="Wave, be friends"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11V6.5a1.5 1.5 0 0 1 3 0V11m0-5.5V4.5a1.5 1.5 0 0 1 3 0V11m0-5a1.5 1.5 0 0 1 3 0v6m0-3a1.5 1.5 0 0 1 3 0v4a7 7 0 0 1-7 7h-1a7 7 0 0 1-5.6-2.8L4 15.5a1.6 1.6 0 0 1 2.5-2L7 14"/></svg></button>
     </div>
-    <div class="act-labels"><span>Pass</span><span>Wave</span><span>Spark</span></div>
-    <p class="sample-note">Wave means friendship, Spark means dating. Drag a card: right to wave, up to spark, left to pass.</p>`;
+    <div class="act-labels"><span>Pass</span><span>Wave</span></div>
+    <p class="friends-only">${SHIELD}Here for friendship and allyship, side by side.</p>`;
   $("#btn-pass").onclick = () => decide("pass");
   $("#btn-wave").onclick = () => decide("wave");
-  $("#btn-spark").onclick = () => decide("spark");
   attachDrag();
 }
 
@@ -406,20 +616,18 @@ function topCard() { return [...document.querySelectorAll("#deck .card")].pop();
 
 function attachDrag() {
   const card = topCard(); if (!card) return;
-  let sx = 0, sy = 0, dx = 0, dy = 0, on = false;
+  let sx = 0, dx = 0, on = false;
   const stamp = cls => card.querySelector(".stamp." + cls);
-  card.addEventListener("pointerdown", e => { on = true; sx = e.clientX; sy = e.clientY; card.setPointerCapture(e.pointerId); card.classList.add("dragging"); });
+  card.addEventListener("pointerdown", e => { on = true; sx = e.clientX; dx = 0; card.setPointerCapture(e.pointerId); card.classList.add("dragging"); });
   card.addEventListener("pointermove", e => {
     if (!on) return;
-    dx = e.clientX - sx; dy = e.clientY - sy;
-    card.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx / 18}deg)`;
+    dx = e.clientX - sx;
+    card.style.transform = `translate(${dx}px, 0) rotate(${dx / 18}deg)`;
     stamp("wave").style.opacity = Math.max(0, dx / 100);
     stamp("pass").style.opacity = Math.max(0, -dx / 100);
-    stamp("spark").style.opacity = Math.max(0, -dy / 120 - Math.abs(dx) / 200);
   });
   card.addEventListener("pointerup", () => {
     if (!on) return; on = false; card.classList.remove("dragging");
-    if (dy < -110 && Math.abs(dx) < 120) return decide("spark");
     if (dx > 110) return decide("wave");
     if (dx < -110) return decide("pass");
     card.style.transform = ""; card.querySelectorAll(".stamp").forEach(s => s.style.opacity = 0);
@@ -429,26 +637,25 @@ function attachDrag() {
 function decide(kind) {
   const card = topCard(); if (!card) return;
   const p = byId(+card.dataset.id);
-  const out = { pass: "translate(-140%, 20px) rotate(-20deg)", wave: "translate(140%, 20px) rotate(20deg)", spark: "translate(0, -140%)" }[kind];
-  card.style.transform = out; card.style.opacity = 0;
-  (state.seen ||= new Set()).add(p.id);
+  card.style.transform = kind === "pass" ? "translate(-140%, 20px) rotate(-20deg)" : "translate(140%, 20px) rotate(20deg)";
+  card.style.opacity = 0;
+  state.seen.add(p.id);
   setTimeout(() => {
     renderMeet();
-    // In the prototype, a wave or spark matches when intent lines up and the id is odd.
-    const mutual = kind === "wave" ? p.intents.includes("friends") : kind === "spark" ? p.intents.includes("dating") : false;
-    if (mutual && p.id % 2) showMatch(p, kind);
+    // In the prototype, a wave is mutual when the id is odd.
+    if (kind === "wave" && p.id % 2) showMatch(p);
   }, 280);
 }
 
-function showMatch(p, kind) {
+function showMatch(p) {
   const me = { name: "You", p: 5 };
   const el = document.createElement("div");
   el.className = "match";
-  el.innerHTML = `<div class="match-card" role="dialog" aria-label="It's a match">
-    <span class="mono" style="color:var(--${kind === "spark" ? "rose" : "teal"})">${kind === "spark" ? "Mutual spark" : "Mutual wave"}</span>
+  el.innerHTML = `<div class="match-card" role="dialog" aria-label="New friend">
+    <span class="mono" style="color:var(--teal)">Mutual wave</span>
     <div class="pair">${avatar(me)}${avatar(p)}</div>
-    <h2>You and ${esc(p.name)} ${kind === "spark" ? "both felt it" : "want to be friends"}</h2>
-    <p class="sample-note">Say hi with something from her profile. Twine nudges both of you to pick a public spot for a first meet.</p>
+    <h2>You and ${esc(p.name)} want to be friends</h2>
+    <p class="sample-note">Say hi with something from her profile. For a first meet, Twine suggests a group event or a public spot.</p>
     <button class="btn rose" id="m-say">Say hi</button>
     <button class="btn ghost" id="m-later">Keep exploring</button>
   </div>`;
@@ -458,14 +665,14 @@ function showMatch(p, kind) {
 }
 
 // ---------- NEARBY (grid) ----------
-const FILTERS = [["online", "Online now"], ["verified", "Verified"], ["friends", "Friends"], ["dating", "Dating"], ["live", "Live now"]];
+const FILTERS = [["online", "Online now"], ["verified", "Verified"], ["crew", "Show-up crew"], ["walk", "Walk-home buddy"], ["live", "Live now"]];
 function renderNearby() {
   const v = $("#view-nearby");
-  let list = people.filter(intentMatches);
+  let list = [...people];
   if (state.filters.has("online")) list = list.filter(p => p.online);
   if (state.filters.has("verified")) list = list.filter(p => p.verified);
-  if (state.filters.has("friends")) list = list.filter(p => p.intents.includes("friends"));
-  if (state.filters.has("dating")) list = list.filter(p => p.intents.includes("dating"));
+  if (state.filters.has("crew")) list = list.filter(p => p.offers.includes("crew"));
+  if (state.filters.has("walk")) list = list.filter(p => p.offers.includes("walk"));
   if (state.filters.has("live")) list = list.filter(p => rooms.some(r => r.host === p.name));
   list = rankNearby(list);
   v.innerHTML = `
@@ -477,7 +684,7 @@ function renderNearby() {
         <span class="meta">${esc(p.name)}, ${p.age}<small>${fuzzy(p.miles)}</small></span>
       </button>`).join("") || `<p class="sample-note" style="grid-column:1/-1">Nobody matches those filters right now. Try turning one off.</p>`}
     </div>
-    <div class="privacy-line"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>
+    <div class="privacy-line">${SHIELD}
       Distances are rounded and never exact. You can hide your distance, go invisible, or show only to verified members in Settings.</div>`;
   v.querySelectorAll("[data-f]").forEach(b => b.onclick = () => {
     const k = b.dataset.f; state.filters.has(k) ? state.filters.delete(k) : state.filters.add(k); renderNearby();
@@ -490,20 +697,30 @@ function openProfile(p) {
     <div style="aspect-ratio:1;max-width:100%">${avatar(p, "fill")}</div>
     <div class="name" style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><span class="pron">${esc(p.pronouns)} · ${fuzzy(p.miles)}</span>
       ${p.verified ? `<span class="verified">Verified</span>` : `<span class="chip g">Not yet verified</span>`}</div>
-    <div class="chips">${p.intents.map(i => `<span class="chip ${i === "friends" ? "t" : ""}">${i === "friends" ? "Friends" : "Dating"}</span>`).join("")}${p.tags.map(t => `<span class="chip g">${esc(t)}</span>`).join("")}</div>
+    <div class="chips">${offerChips(p)}${p.tags.map(t => `<span class="chip g">${esc(t)}</span>`).join("")}</div>
     <div class="prompt"><b>${esc(p.prompt[0])}</b>${esc(p.prompt[1])}</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn rose" id="pf-msg">Message</button><button class="btn ghost" id="pf-report">Report or block</button></div>`);
   s.querySelector("#pf-msg").onclick = () => { s.remove(); openDM(p); };
-  s.querySelector("#pf-report").onclick = () => openReport(p, s);
+  s.querySelector("#pf-report").onclick = () => openReport(p, s, p.prompt[1], "Profile");
 }
 
-function openReport(p, parent) {
+const REPORT_REASONS = [
+  ["Unwanted advances", "dating", "med"], ["Fetishizing or chasing", "fetish", "high"], ["Transphobia or misgendering", "misgender", "high"],
+  ["Invasive questions about my body or history", "invasive", "high"], ["Harassment", "other", "high"], ["Fake profile", "other", "low"], ["Something else", "other", "low"],
+];
+function openReport(p, parent, text, where) {
   const s = sheet(`Report ${esc(p.name)}`, `
-    <p>Your report is private. ${esc(p.name)} won't know who sent it. Blocking hides you from each other everywhere on Twine, including Live and Events.</p>
-    ${["Fetishizing or chasing", "Transphobia or misgendering", "Harassment", "Fake profile", "Something else"].map((r, i) =>
-      `<label class="check"><input type="radio" name="reason" id="reason-${i}"> ${r}</label>`).join("")}
+    <p>Your report is private. ${esc(p.name)} won't know who sent it. A volunteer mod reviews every report, usually within the hour. Blocking hides you from each other everywhere on Twine.</p>
+    ${REPORT_REASONS.map(([r], i) => `<label class="check"><input type="radio" name="reason" id="reason-${i}" value="${i}"> ${r}</label>`).join("")}
     <button class="btn rose" id="rp-send">Block and report</button>`);
-  s.querySelector("#rp-send").onclick = () => { s.remove(); parent?.remove(); toast(`Blocked ${p.name}. Our safety team will review.`); };
+  s.querySelector("#rp-send").onclick = () => {
+    const pick = s.querySelector("input[name=reason]:checked");
+    if (!pick) return toast("Pick a reason so the mod knows what to look for.");
+    const [, cat, sev] = REPORT_REASONS[+pick.value];
+    const n = Math.max(...cases.map(c => +c.id.slice(2))) + 1;
+    cases.unshift({ id: `T-${n}`, sev, cat, source: "Report", where, who: p.name, by: "You", age: 0, strikes: 0, claimed: null, status: "open", text });
+    s.remove(); parent?.remove(); toast(`Blocked ${p.name}. A mod will review.`);
+  };
 }
 
 // ---------- LIVE (rooms) ----------
@@ -514,56 +731,89 @@ function renderLive() {
     <div class="section-head"><h2>Live now</h2><span>Every room has volunteer mods</span></div>
     ${rooms.map((r, i) => `
       <button class="room" data-room="${r.id}">
-        <div class="stage stage-anim" style="background-image:${ROOM_BG[i % 4]}">
+        <span class="stage stage-anim" style="display:block;background-image:${ROOM_BG[i % 4]}">
           <span class="live-pill">● LIVE</span><span class="viewers">${r.viewers} watching</span>
           <span class="host">${esc(r.host)}</span>
-        </div>
-        <div class="body"><h3>${esc(r.title)}</h3>
-          <div class="chips"><span class="chip g">${esc(r.cat)}</span><span class="chip t">${r.mods} mods</span></div></div>
+        </span>
+        <span class="body"><h3>${esc(r.title)}</h3>
+          <span class="chips"><span class="chip g">${esc(r.cat)}</span><span class="chip t">${r.mods} mods</span></span></span>
       </button>`).join("")}
     <button class="btn ghost" id="go-live">Start your own room</button>`;
   v.querySelectorAll("[data-room]").forEach(b => b.onclick = () => openRoom(rooms.find(r => r.id === b.dataset.room)));
   $("#go-live").onclick = () => toast("Hosting opens after 2 weeks in good standing.");
 }
 
-const CHATTERS = [["kit", 0], ["mo", 0], ["bea", 0], ["sol", 1], ["wren", 0], ["fern", 1]];
+const CHATTERS = [["kit", 0], ["mo", 0], ["bea", 0], ["sol", 1], ["wren", 0], ["fern", 1], ["tommy_k", 0]];
 const LINES = ["hi hi!! first time here", "this room is so cozy", "omg that outfit", "anyone going to the roller rink mixer?", "sending good vibes 💛",
   "the music tonight 🎶", "welcome in!", "how long have you been streaming?", "love this community fr", "happy to be here as an ally, learning a lot"];
+const BAD_LINES = ["you're so cute, are you single? 😉", "wait are you pre-op?", "dude your setup is sick"];
 let roomTimer = null;
 function openRoom(r) {
   const i = rooms.indexOf(r);
+  const modding = state.mode === "mod";
   const s = sheet(esc(r.title), "", true);
   s.querySelector(".sheet-body").remove();
   s.insertAdjacentHTML("beforeend", `
     <div class="room-stage stage-anim" style="background-image:${ROOM_BG[i % 4]}"><span class="live-pill">● LIVE · ${r.viewers}</span><div class="floaters" id="floaters"></div></div>
     <div class="chatlog" id="chatlog" aria-live="polite">
-      <div class="msg sys">Room rules: be kind, use people's names and pronouns, no DMs without asking. Mods remove anyone who breaks them.</div>
+      <div class="msg sys">${modding ? "You're watching as a mod. Flagged messages are held and highlighted for you." : "Room rules: be kind, use people's names and pronouns, keep it friendly, no DMs without asking. Mods remove anyone who breaks them."}</div>
     </div>
     <div class="react-row">${["💛", "🩷", "🩵", "✨", "👏"].map(e => `<button data-e="${e}" aria-label="React ${e}">${e}</button>`).join("")}</div>
-    <form class="composer" id="room-form"><input id="room-input" placeholder="Say something kind" autocomplete="off"><button class="btn rose">Send</button></form>`);
-  const log = s.querySelector("#chatlog");
-  const add = (who, text, mod) => {
+    <form class="composer" id="room-form"><input id="room-input" placeholder="${modding ? "Message the room as a mod" : "Say something kind"}" autocomplete="off"><button class="btn rose">Send</button></form>`);
+  const chat = s.querySelector("#chatlog");
+  const add = (who, text, isMod) => {
     const d = document.createElement("div"); d.className = "msg";
-    d.innerHTML = `${mod ? `<span class="mod">MOD</span>` : ""}<b style="color:var(--${mod ? "teal" : "rose"})">${esc(who)}</b>${esc(text)}`;
-    log.appendChild(d); log.scrollTop = log.scrollHeight;
+    const flagged = !isMod && who !== "you" && findFlags(text).length > 0;
+    if (flagged && !modding) {
+      d.className = "msg sys"; d.textContent = `A message from ${who} was held for mod review.`;
+    } else if (flagged) {
+      d.className = "msg flagged";
+      d.innerHTML = `<span><b style="color:var(--rose)">${esc(who)}</b>${highlight(text)}</span>
+        <span class="msg-acts"><button data-a="hide" class="x">Hide</button><button data-a="allow">Allow</button><button data-a="time">Timeout 10m</button></span>`;
+      d.querySelectorAll("[data-a]").forEach(b => b.onclick = () => {
+        const a = b.dataset.a;
+        if (a === "allow") { d.className = "msg"; d.innerHTML = `<b style="color:var(--rose)">${esc(who)}</b>${esc(text)}`; addLog(`Allowed a held message from ${who} in ${r.title}`); }
+        else if (a === "hide") { d.className = "msg sys"; d.textContent = `You hid a message from ${who}.`; addLog(`Hid a message from ${who} in ${r.title}`); }
+        else { d.className = "msg sys"; d.textContent = `${who} is timed out for 10 minutes.`; addLog(`Timed out ${who} for 10 minutes in ${r.title}`); }
+      });
+    } else {
+      d.innerHTML = `${isMod ? `<span class="mod">MOD</span>` : ""}<b style="color:var(--${isMod ? "teal" : "rose"})">${esc(who)}</b>${esc(text)}`;
+    }
+    chat.appendChild(d); chat.scrollTop = chat.scrollHeight;
   };
   const float = e => { const f = document.createElement("span"); f.textContent = e; f.style.left = Math.random() * 20 + "px"; s.querySelector("#floaters").appendChild(f); setTimeout(() => f.remove(), 2200); };
   add(r.host, "hey everyone, settle in 💛", false);
   clearInterval(roomTimer);
   roomTimer = setInterval(() => {
-    if (!document.body.contains(log)) return clearInterval(roomTimer);
+    if (!document.body.contains(chat)) return clearInterval(roomTimer);
     const [who, mod] = CHATTERS[Math.floor(Math.random() * CHATTERS.length)];
-    add(who, LINES[Math.floor(Math.random() * LINES.length)], !!mod);
+    const pool = !mod && Math.random() < .18 ? BAD_LINES : LINES;
+    add(who, pool[Math.floor(Math.random() * pool.length)], !!mod);
     if (Math.random() > .5) float(["💛", "🩷", "🩵", "✨"][Math.floor(Math.random() * 4)]);
   }, 1800);
   s.querySelectorAll("[data-e]").forEach(b => b.onclick = () => float(b.dataset.e));
-  s.querySelector("#room-form").onsubmit = e => {
-    e.preventDefault(); const inp = s.querySelector("#room-input");
-    if (inp.value.trim()) { add("you", inp.value.trim(), false); inp.value = ""; }
+  const inp = s.querySelector("#room-input"), form = s.querySelector("#room-form");
+  inp.oninput = () => { if (!findFlags(inp.value).length) s.querySelector(".nudge")?.remove(); };
+  form.onsubmit = e => {
+    e.preventDefault(); const text = inp.value.trim(); if (!text) return;
+    if (!modding && findFlags(text).length) return nudge(s, text, s.querySelector(".react-row"));
+    add(modding ? "you" : "you", text, modding); inp.value = "";
   };
 }
 
-// ---------- EVENTS (mixers) ----------
+// A gentle check before a member sends something the filter catches.
+function nudge(s, text, anchor) {
+  s.querySelector(".nudge")?.remove();
+  const cats = [...new Set(findFlags(text).map(h => h.cat))];
+  const dating = cats.includes("dating");
+  const el = document.createElement("div"); el.className = "nudge"; el.setAttribute("role", "alert");
+  el.innerHTML = `<b>${dating ? "Keep it friendly" : "This could hurt someone"}</b>
+    <span>${dating ? "Twine is a friendship space. Try saying it the way you would to a friend." : `The highlighted part may break pledge rule ${FLAG_CATS[cats[0]].rule}. Mind rewording it?`}</span>
+    <span class="quote small">${highlight(text)}</span>`;
+  anchor.before(el);
+}
+
+// ---------- EVENTS ----------
 function renderEvents() {
   const v = $("#view-events");
   v.innerHTML = `
@@ -612,22 +862,221 @@ function openDM(p) {
       <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="dm-share">Share plan</button><button class="btn ghost" id="dm-check">Set check-in</button></div>
     </div>`, true);
   s.insertAdjacentHTML("beforeend", `<form class="composer" id="dm-form"><input id="dm-input" placeholder="Message ${esc(p.name)}" autocomplete="off"><button class="btn rose">Send</button></form>`);
-  const body = s.querySelector(".sheet-body");
+  const body = s.querySelector(".sheet-body"), form = s.querySelector("#dm-form"), inp = s.querySelector("#dm-input");
   s.querySelector("#dm-share").onclick = () => toast("Plan shared with your trusted contact.");
   s.querySelector("#dm-check").onclick = () => toast("Check-in set for 9:30 pm.");
-  s.querySelector("#dm-form").onsubmit = e => {
-    e.preventDefault(); const inp = s.querySelector("#dm-input"); if (!inp.value.trim()) return;
-    const b = document.createElement("div"); b.className = "bubble me"; b.textContent = inp.value.trim();
+  inp.oninput = () => { if (!findFlags(inp.value).length) s.querySelector(".nudge")?.remove(); };
+  form.onsubmit = e => {
+    e.preventDefault(); const text = inp.value.trim(); if (!text) return;
+    if (findFlags(text).length) return nudge(s, text, form);
+    s.querySelector(".nudge")?.remove();
+    const b = document.createElement("div"); b.className = "bubble me"; b.textContent = text;
     body.insertBefore(b, body.querySelector(".safety-card")); inp.value = "";
   };
   s.querySelector(".sheet-head").insertAdjacentHTML("beforeend", `<button class="icon-btn" id="dm-flag" aria-label="Report or block"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 21V4h11l-2 4 2 4H5"/></svg></button>`);
-  s.querySelector("#dm-flag").onclick = () => openReport(p, s);
+  s.querySelector("#dm-flag").onclick = () => openReport(p, s, t ? t.last : "Reported from a direct message", "Direct message");
+}
+
+// ================= MOD TEAM =================
+const QF = [["open", "Open"], ["high", "High"], ["dating", "Advances"], ["invasive", "Invasive"], ["fetish", "Fetishizing"], ["misgender", "Misgendering"], ["done", "Resolved"]];
+function legendHTML(cats = ["dating", "invasive", "fetish", "misgender"]) {
+  return `<div class="legend"><span>Highlights:</span>${cats.filter(c => c !== "other").map(c => `<mark class="hl hl-${c}">${FLAG_CATS[c].label}</mark>`).join("")}</div>`;
+}
+function caseCard(c) {
+  const closed = c.status !== "open";
+  return `<button class="case ${closed ? "closed" : ""}" data-case="${c.id}">
+    <span class="case-top">${closed ? `<span class="sev done">${DONE_LABEL[c.status]}</span>` : `<span class="sev ${c.sev}">${SEV[c.sev]}</span>`}
+      <span class="chip c-${c.cat}">${FLAG_CATS[c.cat].label}</span><span>${esc(c.where)}</span></span>
+    <span class="case-text">${highlight(c.text)}</span>
+    <span class="case-foot"><span>${esc(c.who)} · ${c.source === "Report" ? `reported by ${esc(c.by)}` : "auto-flagged"}</span>
+      ${closed ? `<span>by ${esc(c.resolvedBy)}</span>` : c.claimed ? `<span class="claimed">${c.claimed === "You" ? "Claimed by you" : `${esc(c.claimed)} has it`}</span>` : `<span>waiting ${fmtAge(c.age)}</span>`}</span>
+  </button>`;
+}
+function renderQueue() {
+  const v = $("#view-queue");
+  const open = openCases();
+  const high = open.filter(c => c.sev === "high").length;
+  const oldest = open.length ? Math.max(...open.map(c => c.age)) : 0;
+  let list = state.qf === "done" ? cases.filter(c => c.status !== "open")
+    : open.filter(c => state.qf === "open" || (state.qf === "high" ? c.sev === "high" : c.cat === state.qf));
+  if (state.qf !== "done") list.sort((a, b) => SEV_RANK[a.sev] - SEV_RANK[b.sev] || b.age - a.age);
+  v.innerHTML = `
+    <div class="section-head"><h2>Review queue</h2><span>${mods.filter(m => m.on).length} mods on shift</span></div>
+    <div class="stats">
+      <div><b>${open.length}</b><small>Open cases</small></div>
+      <div><b class="${high ? "alert" : ""}">${high}</b><small>High severity</small></div>
+      <div><b>${fmtAge(oldest)}</b><small>Longest wait</small></div>
+    </div>
+    <div class="filters">${QF.map(([k, l]) => `<button id="qf-${k}" data-qf="${k}" aria-pressed="${state.qf === k}">${l}</button>`).join("")}</div>
+    <div class="case-list">${list.map(caseCard).join("") || `<div class="empty" style="padding:30px 10px"><h2>All clear</h2><p>Nothing here right now. Check Live for held messages.</p></div>`}</div>
+    ${legendHTML()}
+    <p class="sample-note">The filter highlights words that often break the pledge. It's a starting point. You make the call.</p>`;
+  v.querySelectorAll("[data-qf]").forEach(b => b.onclick = () => { state.qf = b.dataset.qf; renderQueue(); });
+  v.querySelectorAll("[data-case]").forEach(b => b.onclick = () => openCase(cases.find(c => c.id === b.dataset.case)));
+}
+
+function recommend(c) {
+  if (c.cat === "fetish" || c.strikes >= 2) return ["remove", c.cat === "fetish" ? "Fetishizing is an immediate removal." : "Third strike."];
+  if (c.strikes === 1) return ["mute", "Second strike for this member."];
+  if (isEditable(c)) return ["fix", "First strike. Edit the content and send a warning."];
+  return ["hide", "First strike. Hide it and send a warning."];
+}
+const isEditable = c => /^(Profile|Event)/.test(c.where);
+function warnText(c, action) {
+  const r = FLAG_CATS[c.cat].rule;
+  const what = { fix: "We edited it", hide: "We hid it", warn: "Please take it down", mute: "Your account is muted for 7 days", remove: "Your account has been removed" }[action] || "We've noted it";
+  const why = c.cat === "dating" ? "Twine is a friendship space, so advances like this aren't allowed"
+    : `It breaks pledge rule ${r}: ${RULES[r - 1]}`;
+  return `Hi ${c.who}, a mod reviewed something you posted (${c.where.toLowerCase()}). ${why}. ${what}. ${action === "remove" ? "" : "If you think we got this wrong, reply here and a different mod will look."}`.trim();
+}
+
+function openCase(c) {
+  const closed = c.status !== "open";
+  const [rec, recWhy] = recommend(c);
+  const editable = isEditable(c);
+  const cats = [...new Set(findFlags(c.text).map(h => h.cat))];
+  const r = FLAG_CATS[c.cat].rule;
+  const s = sheet(`Case ${c.id}`, `
+    <div class="case-top">${closed ? `<span class="sev done">${DONE_LABEL[c.status]}</span>` : `<span class="sev ${c.sev}">${SEV[c.sev]}</span>`}<span class="chip c-${c.cat}">${FLAG_CATS[c.cat].label}</span></div>
+    <dl class="kv">
+      <dt>Member</dt><dd>${esc(c.who)} · ${c.strikes ? `${c.strikes} prior strike${c.strikes > 1 ? "s" : ""}` : "no prior strikes"}</dd>
+      <dt>Where</dt><dd>${esc(c.where)}</dd>
+      <dt>Source</dt><dd>${c.source === "Report" ? `Report from ${esc(c.by)}` : "Twine filter"} · ${c.age ? `${fmtAge(c.age)} ago` : "just now"}</dd>
+      <dt>Rule</dt><dd>${r}. ${esc(RULES[r - 1])}</dd>
+    </dl>
+    <span class="mono" style="color:var(--muted)">Flagged content</span>
+    <div class="quote">${highlight(c.text)}</div>
+    ${cats.length ? legendHTML(cats) : `<p class="sample-note">The filter didn't catch anything here. Read the report and use your judgment.</p>`}
+    ${closed ? `<div class="rec">${DONE_LABEL[c.status]} by <b>${esc(c.resolvedBy)}</b>${c.fixed ? `. New text: “${esc(c.fixed)}”` : ""}</div>` : `
+    <div class="rec">Suggested: <b>${ACTIONS[rec]}</b>. ${recWhy}</div>
+    <button class="btn ghost" id="cs-claim">${c.claimed === "You" ? "Claimed by you" : c.claimed ? `Take over from ${esc(c.claimed)}` : "Claim this case"}</button>
+    ${editable ? `
+    <div class="field"><label for="cs-fix">Fixed version</label>
+      <textarea id="cs-fix">${esc(c.fix ?? stripFlags(c.text))}</textarea>
+      <div class="fixcheck" id="cs-fixcheck" aria-live="polite"></div></div>` : ""}
+    <div class="field"><label for="cs-warn">Message to ${esc(c.who)}</label><textarea id="cs-warn">${esc(warnText(c, rec))}</textarea></div>
+    <div class="field"><label for="cs-note">Note for the team</label><input id="cs-note" placeholder="Only mods see this"></div>
+    <hr class="divider">
+    <div class="action-grid">
+      ${editable ? `<button class="btn teal" data-act="fix">Apply fix</button>` : `<button class="btn teal" data-act="hide">Hide content</button>`}
+      <button class="btn" data-act="warn">Send warning</button>
+      <button class="btn ghost" data-act="mute">Mute 7 days</button>
+      <button class="btn danger" data-act="remove">Remove from Twine</button>
+    </div>
+    <button class="btn ghost" data-act="dismiss">Dismiss, no rule broken</button>`}`);
+  if (closed) return;
+  const fix = s.querySelector("#cs-fix"), check = s.querySelector("#cs-fixcheck"), warn = s.querySelector("#cs-warn");
+  const recheck = () => {
+    if (!fix) return;
+    const left = findFlags(fix.value);
+    check.className = "fixcheck " + (left.length ? "bad" : "ok");
+    check.innerHTML = left.length ? `Still flagged: <span>${highlight(fix.value)}</span>` : "Clean. Nothing left for the filter to flag.";
+  };
+  fix && (fix.oninput = recheck); recheck();
+  s.querySelector("#cs-claim").onclick = e => { c.claimed = "You"; e.target.textContent = "Claimed by you"; toast(`You claimed ${c.id}.`); };
+  s.querySelectorAll("[data-act]").forEach(b => b.onclick = () => {
+    const act = b.dataset.act;
+    if (act === "fix" && findFlags(fix.value).length && !b.dataset.ok) { b.dataset.ok = "1"; b.textContent = "Still flagged. Apply anyway?"; return; }
+    if (act === "remove" && !b.classList.contains("armed")) { b.classList.add("armed"); b.textContent = "Tap again to remove"; return; }
+    resolve(c, act, { fixed: fix?.value.trim(), note: s.querySelector("#cs-note").value.trim() });
+    s.remove();
+  });
+  // Keep the member message in step with the action a mod hovers toward.
+  s.querySelectorAll("[data-act]").forEach(b => b.addEventListener("pointerenter", () => {
+    if (!warn.dataset.touched && b.dataset.act !== "dismiss") warn.value = warnText(c, b.dataset.act);
+  }));
+  warn.oninput = () => warn.dataset.touched = "1";
+}
+
+function resolve(c, act, { fixed, note }) {
+  c.status = act; c.resolvedBy = "You"; c.claimed = "You";
+  if (act === "fix") c.fixed = fixed;
+  const r = FLAG_CATS[c.cat].rule;
+  const what = {
+    fix: `Applied a fix to ${c.who}'s ${c.where.toLowerCase()} and sent a warning`,
+    hide: `Hid ${c.who}'s content (${c.where}) and sent a warning`,
+    warn: `Warned ${c.who} (rule ${r})`,
+    mute: `Muted ${c.who} for 7 days (rule ${r})`,
+    remove: `Removed ${c.who} from Twine (rule ${r})`,
+    dismiss: `Dismissed a report on ${c.who}: no rule broken`,
+  }[act];
+  addLog(what + (note ? `. Note: ${note}` : ""), c.id);
+  toast(`${c.id} ${DONE_LABEL[act].toLowerCase()}.`);
+  show("queue");
+}
+
+// ---------- MOD: live rooms ----------
+function renderModLive() {
+  const v = $("#view-modlive");
+  v.innerHTML = `
+    <div class="section-head"><h2>Room watch</h2><span>Flags in the last hour</span></div>
+    <div class="panel">${rooms.map(r => {
+      const pct = Math.min(100, r.flags * 15), heat = r.flags >= 5 ? "hot" : r.flags >= 3 ? "warm" : "";
+      const thin = r.viewers / r.mods > 100;
+      return `<div class="room-row">
+        <div class="line"><div><b>${esc(r.title)}</b><small>${r.viewers} watching · ${r.mods} mod${r.mods > 1 ? "s" : ""} in room${thin ? ` · <span style="color:var(--sev-high);font-weight:600">needs another mod</span>` : ""}</small></div>
+          <button class="btn ghost" data-watch="${r.id}">Watch</button></div>
+        <div class="meter" aria-label="${r.flags} flags this hour"><i class="${heat}" style="width:${pct}%"></i></div>
+      </div>`;
+    }).join("")}</div>
+    <div class="section-head"><h2>Held messages</h2><span>${held.length} waiting</span></div>
+    <div class="panel">${held.length ? held.map(h => `
+      <div class="held">
+        <span class="who">${esc(h.who)} in ${esc(rooms.find(r => r.id === h.room).title)}</span>
+        <span class="case-text">${highlight(h.text)}</span>
+        ${h.hint ? `<span class="hint">${esc(h.hint)}</span>` : ""}
+        <span class="mini-acts"><button data-h="${h.id}" data-a="allow">Allow</button><button data-h="${h.id}" data-a="hide" class="x">Hide</button><button data-h="${h.id}" data-a="time">Timeout 10m</button></span>
+      </div>`).join("") : `<p class="sample-note">Nothing held. Rooms are calm.</p>`}</div>
+    ${legendHTML()}`;
+  v.querySelectorAll("[data-watch]").forEach(b => b.onclick = () => openRoom(rooms.find(r => r.id === b.dataset.watch)));
+  v.querySelectorAll("[data-h]").forEach(b => b.onclick = () => {
+    const h = held.find(x => x.id === b.dataset.h), room = rooms.find(r => r.id === h.room).title;
+    const words = { allow: `Allowed a held message from ${h.who} in ${room}`, hide: `Hid a message from ${h.who} in ${room}`, time: `Timed out ${h.who} for 10 minutes in ${room}` };
+    addLog(words[b.dataset.a]); held.splice(held.indexOf(h), 1);
+    toast({ allow: "Message posted.", hide: "Message hidden.", time: `${h.who} timed out.` }[b.dataset.a]);
+    renderModLive();
+  });
+}
+
+// ---------- MOD: log ----------
+function renderLog() {
+  $("#view-log").innerHTML = `
+    <div class="section-head"><h2>Action log</h2><span>Tonight</span></div>
+    <div>${log.map(l => `<div class="log-row"><time>${esc(l.t)}</time><div><b>${esc(l.who)}</b> ${esc(l.what)}${l.ref ? `<small>${esc(l.ref)}</small>` : ""}</div></div>`).join("")}</div>
+    <p class="sample-note">Every action is logged so a second mod can review it. Members can appeal any decision.</p>`;
+}
+
+// ---------- MOD: team & policy ----------
+function renderTeam() {
+  $("#view-team").innerHTML = `
+    <div class="section-head"><h2>Tonight's team</h2><span>${mods.filter(m => m.on).length} on shift</span></div>
+    <div class="panel roster">${mods.map(m => `<div class="mod-row">${avatar(m)}<div class="txt"><b>${esc(m.name)}</b><small>${esc(m.role)} · ${esc(m.shift)}</small></div>
+      <span class="onshift ${m.on ? "" : "off"}">${m.on ? "On shift" : "Off"}</span></div>`).join("")}</div>
+
+    <div class="panel"><h3>A friendship space</h3>
+      <p style="margin:0;font-size:14px">Anything that turns a friendship space into a pickup space gets edited or removed.</p>
+      <div class="twocol">
+        <div class="no"><h4>Take action</h4><ul><li>Asking someone out or "just the two of us" invites</li><li>Flirting, romantic compliments, winky emoji at someone</li><li>"Single" or "more than friends" in a profile</li><li>Hookup talk of any kind</li></ul></div>
+        <div class="yes"><h4>This is fine</h4><ul><li>"Love your jacket" or "your stream is so cozy"</li><li>Talking about your own partner</li><li>Group plans and carpools</li><li>Members sharing their own news, including medical</li></ul></div>
+      </div></div>
+
+    <div class="panel"><h3>Enforcement ladder</h3>
+      <ol class="ladder">
+        <li>First strike: edit or hide the content and send a warning.</li>
+        <li>Second strike: mute for 7 days.</li>
+        <li>Third strike: remove from Twine.</li>
+      </ol>
+      <p class="sample-note" style="margin:0">Fetishizing, threats, and outing someone skip the ladder: remove on the first strike, and tell the lead mod.</p></div>
+
+    <div class="panel"><h3>What the highlights mean</h3>
+      ${Object.entries(FLAG_CATS).filter(([k]) => k !== "other").map(([k, f]) => `<div style="font-size:14px"><mark class="hl hl-${k}">${f.label}</mark> <span style="color:var(--muted)">· pledge rule ${f.rule}</span></div>`).join("")}
+      <p class="sample-note" style="margin:0">Highlights are hints. "Surgery" in a member's own update is fine. "Are you pre-op?" aimed at someone isn't.</p></div>`;
 }
 
 // ---------- shared UI ----------
 function sheet(title, html, flush) {
   const s = document.createElement("div");
-  s.className = "sheet"; s.setAttribute("role", "dialog"); s.setAttribute("aria-label", title);
+  s.className = "sheet"; s.setAttribute("role", "dialog"); s.setAttribute("aria-label", title.replace(/<[^>]+>/g, ""));
   s.innerHTML = `<div class="sheet-head"><button class="icon-btn" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>${title}</h2></div><div class="sheet-body">${html}</div>`;
   s.querySelector(".icon-btn").onclick = () => s.remove();
   $("#app").appendChild(s);
@@ -639,34 +1088,64 @@ function toast(msg) {
   $("#app").appendChild(t); setTimeout(() => t.remove(), 2600);
 }
 
-const RENDER = { meet: renderMeet, nearby: renderNearby, live: renderLive, events: renderEvents, chats: renderChats };
+const ICON = {
+  meet: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="5" y="3" width="12" height="16" rx="3" transform="rotate(-8 11 11)"/><path d="M9 21h9a3 3 0 0 0 3-3V8"/></svg>`,
+  nearby: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>`,
+  live: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="2" y="5" width="15" height="14" rx="3"/><path d="M17 10l5-3v10l-5-3z"/></svg>`,
+  events: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>`,
+  chats: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>`,
+  queue: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 13h5l1.5 3h5L16 13h5"/><path d="M5 5h14l2 8v6H3v-6z"/></svg>`,
+  log: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h12M9 12h12M9 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>`,
+  team: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>`,
+};
+const NAVS = {
+  member: [["meet", "Meet"], ["nearby", "Nearby"], ["live", "Live", () => rooms.length], ["events", "Events"], ["chats", "Chats"]],
+  mod: [["queue", "Queue", () => openCases().length], ["modlive", "Live", () => held.length], ["log", "Log"], ["team", "Team"]],
+};
+const ICON_FOR = { modlive: "live" };
+function renderNav() {
+  const items = NAVS[state.mode], nav = $("#tabs");
+  nav.style.gridTemplateColumns = `repeat(${items.length}, 1fr)`;
+  nav.innerHTML = items.map(([v, l, badge]) => {
+    const n = badge ? badge() : 0;
+    return `<button role="tab" id="tab-${v}" data-view="${v}" aria-selected="${v === state.view}">${ICON[ICON_FOR[v] || v]}${l}${n ? `<span class="badge">${n}</span>` : ""}</button>`;
+  }).join("");
+  nav.querySelectorAll("button").forEach(b => b.onclick = () => show(b.dataset.view));
+}
+
+const RENDER = { meet: renderMeet, nearby: renderNearby, live: renderLive, events: renderEvents, chats: renderChats,
+  queue: renderQueue, modlive: renderModLive, log: renderLog, team: renderTeam };
 function show(view) {
-  document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.view === view));
+  state.view = view;
+  renderNav();
   document.querySelectorAll("main .view").forEach(s => s.hidden = s.id !== "view-" + view);
   document.querySelectorAll(".sheet").forEach(s => s.remove());
   RENDER[view](); $("#main").scrollTop = 0;
 }
-document.querySelectorAll("nav.tabs button").forEach(b => b.onclick = () => show(b.dataset.view));
-document.querySelectorAll(".intent button").forEach(b => b.onclick = () => {
-  state.intent = b.dataset.intent;
-  document.querySelectorAll(".intent button").forEach(x => x.setAttribute("aria-pressed", x === b));
-  const cur = document.querySelector("nav.tabs [aria-selected=true]").dataset.view; RENDER[cur]();
-});
+function setMode(mode) {
+  state.mode = mode; clearInterval(roomTimer);
+  $("#app").classList.toggle("mod", mode === "mod");
+  $("#modpill").hidden = mode !== "mod";
+  document.querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === mode));
+  show(mode === "mod" ? "queue" : "meet");
+}
+document.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => setMode(b.dataset.mode));
 
 // ---------- feedback (opens a pre-filled GitHub issue form) ----------
 const FEEDBACK_REPO = "https://github.com/EngineeringMoonBear/twine/issues/new";
 const FB_KINDS = ["Idea", "Confusing", "Bug", "Love it", "Missing"];
-const TAB_NAMES = { meet: "Meet", nearby: "Nearby", live: "Live", events: "Events", chats: "Chats" };
+const VIEW_NAMES = { meet: "Meet", nearby: "Nearby", live: "Live", events: "Events", chats: "Chats",
+  queue: "Mod › Queue", modlive: "Mod › Live", log: "Mod › Log", team: "Mod › Team" };
 
 // Where the reviewer is right now: the tab, plus whatever sheet is open on top of it.
 function feedbackContext() {
-  const tab = TAB_NAMES[document.querySelector("nav.tabs [aria-selected=true]").dataset.view];
+  const tab = VIEW_NAMES[state.view];
   const top = [...document.querySelectorAll(".sheet:not(.fb-sheet)")].pop()?.getAttribute("aria-label");
-  const screen = document.querySelector(".match") ? `${tab} › Match screen` : top ? `${tab} › ${top}` : tab;
+  const screen = document.querySelector(".match") ? `${tab} › New friend` : top ? `${tab} › ${top}` : tab;
   const details = [
     `Platform: web prototype`,
+    `Mode: ${state.mode === "mod" ? "Mod team" : "Member"}`,
     `Viewport: ${innerWidth}×${innerHeight}`,
-    `Looking for: ${state.intent}`,
     `Device: ${navigator.userAgent}`,
     `Page: ${location.host || "claude.ai artifact"}`,
   ].join("\n");
@@ -677,30 +1156,38 @@ function openFeedback() {
   const { screen, details } = feedbackContext();
   let kind = "Idea";
   const s = sheet("Feedback", `
-    <p style="margin:0">Tell Josh what you think about this screen, or the app as a whole. It opens as a note on GitHub, where you can check it before sending.</p>
+    <p style="margin:0">Tell Josh what you think about this screen, or the app as a whole.</p>
     <div class="fb-kinds" role="group" aria-label="Kind of feedback">${FB_KINDS.map(k => `<button id="fb-kind-${k.replace(/\s/g, "")}" data-k="${k}" aria-pressed="${k === kind}">${k}</button>`).join("")}</div>
-    <label class="fb-field" for="fb-screen">Screen<input id="fb-screen" value="${esc(screen)}"></label>
-    <label class="fb-field" for="fb-note">Your feedback<textarea id="fb-note" rows="5" placeholder="What did you like, what confused you, what's missing?"></textarea></label>
+    <div class="field"><label for="fb-screen">Screen</label><input id="fb-screen" value="${esc(screen)}"></div>
+    <div class="field"><label for="fb-note">Your feedback</label><textarea id="fb-note" rows="5" placeholder="What did you like, what confused you, what's missing?"></textarea></div>
     <div class="fb-context" aria-label="Details sent with your note">${esc(details)}</div>
-    <a class="btn rose" id="fb-send" target="_blank" rel="noopener" aria-disabled="true">Open on GitHub</a>
-    <p class="sample-note" style="margin:0">You'll need a free GitHub account to send it.</p>`);
+    <div class="fb-send">
+      <a class="btn rose" id="fb-send" target="_blank" rel="noopener" aria-disabled="true">Send on GitHub</a>
+      <button class="btn ghost" id="fb-copy" disabled>No GitHub? Copy my note</button>
+    </div>
+    <p class="sample-note" style="margin:0">GitHub opens your note so you can check it before sending. Without an account, copy it and text it to Josh.</p>`);
   s.classList.add("fb-sheet");
-  const note = s.querySelector("#fb-note"), scr = s.querySelector("#fb-screen"), send = s.querySelector("#fb-send");
-  const update = () => {
+  const note = s.querySelector("#fb-note"), scr = s.querySelector("#fb-screen"), send = s.querySelector("#fb-send"), copy = s.querySelector("#fb-copy");
+  const title = () => {
     const firstLine = note.value.trim().split("\n")[0].slice(0, 60);
-    const q = new URLSearchParams({
-      template: "feedback.yml",
-      title: `[${kind}] ${scr.value}${firstLine ? ": " + firstLine : ""}`,
-      note: note.value.trim(), screen: scr.value, context: details,
-    });
+    return `[${kind}] ${scr.value}${firstLine ? ": " + firstLine : ""}`;
+  };
+  const update = () => {
+    const q = new URLSearchParams({ template: "feedback.yml", title: title(), note: note.value.trim(), screen: scr.value, context: details });
     send.href = `${FEEDBACK_REPO}?${q}`;
     send.setAttribute("aria-disabled", String(!note.value.trim()));
+    copy.disabled = !note.value.trim();
   };
   s.querySelectorAll("[data-k]").forEach(b => b.onclick = () => {
     kind = b.dataset.k; s.querySelectorAll("[data-k]").forEach(x => x.setAttribute("aria-pressed", x === b)); update();
   });
   note.oninput = scr.oninput = update;
   send.onclick = () => setTimeout(() => { s.remove(); toast("Thanks! Finish sending it on GitHub."); }, 300);
+  copy.onclick = () => {
+    const text = `Twine feedback ${title()}\n\n${note.value.trim()}\n\nScreen: ${scr.value}\n${details}`;
+    const fallback = () => { note.value = text; note.select(); toast("Selected. Copy it and text it to Josh."); };
+    navigator.clipboard?.writeText(text).then(() => toast("Copied. Paste it into a text to Josh."), fallback) ?? fallback();
+  };
   update(); note.focus();
 }
 $("#fb-open").onclick = openFeedback;
@@ -710,16 +1197,11 @@ function pledge() {
   const s = sheet("Before you join", `
     <span class="mono" style="color:var(--rose)">The Twine pledge</span>
     <h2 class="big">Two strands, one thread.</h2>
-    <p>Twine is where cis women and trans women meet as friends, allies, and sometimes more. Everyone here agrees to the same few things.</p>
-    <ol>
-      <li>Trans women are women. No debate, no "just asking questions."</li>
-      <li>Nobody owes you their history, their body, or their transition story.</li>
-      <li>Being trans is a person, not a type. Profiles that fetishize get removed.</li>
-      <li>Allyship is something you do: show up, listen, and back each other up.</li>
-    </ol>
+    <p>Twine is where cis women and trans women meet as friends and allies. Everyone here agrees to the same few things.</p>
+    <ol>${RULES.map(r => `<li>${esc(r)}</li>`).join("")}</ol>
     <label class="check"><input type="checkbox" id="pledge-ok"> I agree, and I understand breaking these gets me removed.</label>
     <button class="btn rose" id="pledge-go" disabled>Join Twine</button>
-    <p class="sample-note">Prototype: everyone shown is fictional sample data.</p>`);
+    <p class="sample-note">Prototype: everyone shown is fictional sample data. Switch to Mod team at the top to see the moderation tools.</p>`);
   s.classList.add("pledge");
   s.querySelector(".icon-btn").remove();
   const ok = s.querySelector("#pledge-ok"), go = s.querySelector("#pledge-go");
@@ -727,6 +1209,6 @@ function pledge() {
   go.onclick = () => { s.remove(); toast("Welcome to Twine 💛"); };
 }
 
-renderMeet();
+show("meet");
 pledge();
 </script>
