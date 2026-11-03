@@ -377,6 +377,7 @@ textarea:focus-visible, .field input:focus-visible { outline: 2px solid var(--te
 .fb-kinds button[aria-pressed="true"] { background: var(--rose); border-color: var(--rose); color: #fff; }
 .fb-context { font-family: var(--font-mono); font-size: 11px; color: var(--muted); background: var(--raised); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .fb-send { display: flex; flex-direction: column; gap: 8px; }
+.fb-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 a.btn { text-decoration: none; text-align: center; }
 a.btn[aria-disabled="true"], .btn:disabled { opacity: .45; pointer-events: none; }
 </style>
@@ -1133,6 +1134,9 @@ document.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => setMode(
 
 // ---------- feedback (opens a pre-filled GitHub issue form) ----------
 const FEEDBACK_REPO = "https://github.com/EngineeringMoonBear/twine/issues/new";
+// The relay files the issue for people without GitHub. Artifacts can't call outside services, so only the hosted site uses it.
+const RELAY_URL = "";
+const canRelay = () => !!RELAY_URL && location.hostname === "twine.joshedunbar.com";
 const FB_KINDS = ["Idea", "Confusing", "Bug", "Love it", "Missing"];
 const VIEW_NAMES = { meet: "Meet", nearby: "Nearby", live: "Live", events: "Events", chats: "Chats",
   queue: "Mod › Queue", modlive: "Mod › Live", log: "Mod › Log", team: "Mod › Team" };
@@ -1154,20 +1158,25 @@ function feedbackContext() {
 
 function openFeedback() {
   const { screen, details } = feedbackContext();
+  const relay = canRelay();
   let kind = "Idea";
   const s = sheet("Feedback", `
     <p style="margin:0">Tell Josh what you think about this screen, or the app as a whole.</p>
     <div class="fb-kinds" role="group" aria-label="Kind of feedback">${FB_KINDS.map(k => `<button id="fb-kind-${k.replace(/\s/g, "")}" data-k="${k}" aria-pressed="${k === kind}">${k}</button>`).join("")}</div>
     <div class="field"><label for="fb-screen">Screen</label><input id="fb-screen" value="${esc(screen)}"></div>
     <div class="field"><label for="fb-note">Your feedback</label><textarea id="fb-note" rows="5" placeholder="What did you like, what confused you, what's missing?"></textarea></div>
+    ${relay ? `<div class="field"><label for="fb-name">Your name (optional)</label><input id="fb-name" autocomplete="given-name" placeholder="So Josh knows who to thank"></div>` : ""}
+    <div class="fb-hp" aria-hidden="true"><label for="fb-website">Website</label><input id="fb-website" tabindex="-1" autocomplete="off"></div>
     <div class="fb-context" aria-label="Details sent with your note">${esc(details)}</div>
     <div class="fb-send">
-      <a class="btn rose" id="fb-send" target="_blank" rel="noopener" aria-disabled="true">Send on GitHub</a>
-      <button class="btn ghost" id="fb-copy" disabled>No GitHub? Copy my note</button>
+      ${relay ? `<button class="btn rose" id="fb-relay" disabled>Send feedback</button>` : ""}
+      <a class="btn ${relay ? "ghost" : "rose"}" id="fb-send" target="_blank" rel="noopener" aria-disabled="true">${relay ? "Have GitHub? Send it there" : "Send on GitHub"}</a>
+      <button class="btn ghost" id="fb-copy" disabled>${relay ? "Copy my note" : "No GitHub? Copy my note"}</button>
     </div>
-    <p class="sample-note" style="margin:0">GitHub opens your note so you can check it before sending. Without an account, copy it and text it to Josh.</p>`);
+    <p class="sample-note" style="margin:0">${relay ? "No account needed. Your note and the details above go straight to Josh." : "GitHub opens your note so you can check it before sending. Without an account, copy it and text it to Josh."}</p>`);
   s.classList.add("fb-sheet");
   const note = s.querySelector("#fb-note"), scr = s.querySelector("#fb-screen"), send = s.querySelector("#fb-send"), copy = s.querySelector("#fb-copy");
+  const relayBtn = s.querySelector("#fb-relay");
   const title = () => {
     const firstLine = note.value.trim().split("\n")[0].slice(0, 60);
     return `[${kind}] ${scr.value}${firstLine ? ": " + firstLine : ""}`;
@@ -1177,6 +1186,7 @@ function openFeedback() {
     send.href = `${FEEDBACK_REPO}?${q}`;
     send.setAttribute("aria-disabled", String(!note.value.trim()));
     copy.disabled = !note.value.trim();
+    if (relayBtn) relayBtn.disabled = !note.value.trim();
   };
   s.querySelectorAll("[data-k]").forEach(b => b.onclick = () => {
     kind = b.dataset.k; s.querySelectorAll("[data-k]").forEach(x => x.setAttribute("aria-pressed", x === b)); update();
@@ -1187,6 +1197,22 @@ function openFeedback() {
     const text = `Twine feedback ${title()}\n\n${note.value.trim()}\n\nScreen: ${scr.value}\n${details}`;
     const fallback = () => { note.value = text; note.select(); toast("Selected. Copy it and text it to Josh."); };
     navigator.clipboard?.writeText(text).then(() => toast("Copied. Paste it into a text to Josh."), fallback) ?? fallback();
+  };
+  if (relayBtn) relayBtn.onclick = async () => {
+    relayBtn.disabled = true; relayBtn.textContent = "Sending…";
+    try {
+      const res = await fetch(RELAY_URL, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind, screen: scr.value, note: note.value.trim(), context: details,
+          name: s.querySelector("#fb-name").value, website: s.querySelector("#fb-website").value }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Couldn't send it right now. Use Copy instead.");
+      s.remove(); toast("Sent! Thanks for helping shape Twine 💛");
+    } catch (err) {
+      toast(err.message.startsWith("Failed to fetch") ? "No connection. Use Copy instead." : err.message);
+      relayBtn.textContent = "Try again"; relayBtn.disabled = false;
+    }
   };
   update(); note.focus();
 }
