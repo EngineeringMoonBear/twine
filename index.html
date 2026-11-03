@@ -1135,7 +1135,7 @@ document.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => setMode(
 // ---------- feedback (opens a pre-filled GitHub issue form) ----------
 const FEEDBACK_REPO = "https://github.com/EngineeringMoonBear/twine/issues/new";
 // The relay files the issue for people without GitHub. Artifacts can't call outside services, so only the hosted site uses it.
-const RELAY_URL = "";
+const RELAY_URL = "https://twine-feedback.twineapp.workers.dev/feedback";
 const canRelay = () => !!RELAY_URL && location.hostname === "twine.joshedunbar.com";
 const FB_KINDS = ["Idea", "Confusing", "Bug", "Love it", "Missing"];
 const VIEW_NAMES = { meet: "Meet", nearby: "Nearby", live: "Live", events: "Events", chats: "Chats",
